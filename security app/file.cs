@@ -8,7 +8,7 @@ namespace security_app
 {
     class file
     {
-        private string securityLevel;
+        private int securityLevel;
         private string urlPath;
         private string name;
 
@@ -17,7 +17,7 @@ namespace security_app
             get { return name; }
             set { name = value; }
         }
-        public string SecurityLevel
+        public int SecurityLevel
         {
             get { return securityLevel; }
             set { securityLevel = value; }

@@ -9,43 +9,31 @@ namespace security_app
 {
     class referenceMonitor
     {
-        
-        SqlConnection connection = new SqlConnection(@"Data Source=(LocalDB)\v11.0;AttachDbFilename=C:\Users\NADUN\Documents\rm.mdf;Integrated Security=True;Connect Timeout=30");
-        
-        public Boolean grantAccess(file File, user User, String action)
-        {
-            if (File.SecurityLevel == User.AccessLevel) return true;
-            return false;
-        }
 
-        private Boolean readability(file File,user User) {
-            string accessLvl="";
-            string secretLvl="";
+        static SqlConnection connection = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\naduni\Documents\rm.mdf;Integrated Security=True;Connect Timeout=30");
+
+        public static Boolean readability(file File, user User)
+        {
+            
+            string secretLvl = "";
             try
             {
                 connection.Open();
-                SqlDataReader myReader = null;
-                SqlCommand myCommand = new SqlCommand("select * from user where name=" + User.Name,
+                
+                SqlDataReader myReader2 = null;
+                SqlCommand myCommand2 = new SqlCommand("select * from [file] where [path]='" + File.UrlPath+"';",
                                                          connection);
-                myReader = myCommand.ExecuteReader();
-                while (myReader.Read())
+                myReader2 = myCommand2.ExecuteReader();
+                while (myReader2.Read())
                 {
-                    Console.WriteLine(myReader["accessLevel"].ToString());
-                    accessLvl = myReader["accessLevel"].ToString();
-                }
-
-                SqlCommand myCommand2 = new SqlCommand("select * from file where name=" + File.Name,
-                                                         connection);
-                myReader = myCommand2.ExecuteReader();
-                while (myReader.Read())
-                {
-                    Console.WriteLine(myReader["secretLevel"].ToString());
-                    secretLvl = myReader["secretLevel"].ToString();
+                    Console.WriteLine(myReader2["secretLevel"].ToString());
+                    secretLvl = myReader2["secretLevel"].ToString();
                 }
 
                 connection.Close();
-
-                if (Int32.Parse(accessLvl) <= Int32.Parse(secretLvl)) return true;
+                Console.WriteLine(secretLvl);
+                Console.WriteLine(User.AccessLevel);
+                if (User.AccessLevel <= Int32.Parse(secretLvl)) return true;
                 return false;
             }
             catch (Exception e)
@@ -55,9 +43,9 @@ namespace security_app
             }
         }
 
-        private Boolean writabiliy(file File, user User)
+        public static Boolean writabiliy(file File, user User)
         {
-            return true;
+            return !readability(File, User);
         }
 
     }

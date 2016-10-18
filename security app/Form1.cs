@@ -13,7 +13,8 @@ namespace security_app
 {
     public partial class Form1 : Form
     {
-        user User = user.getInstance();
+        user User;
+        file openFile;
         public Form1()
         {
             InitializeComponent();
@@ -21,31 +22,21 @@ namespace security_app
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if (textBox1.Text == "admin" && textBox2.Text == "123") {
-                User.AccessLevel = "admin";
-                label3.Text = "Logged in as " + User.AccessLevel;
-                richTextBox1.Visible = true;
-            }
-            else if (textBox1.Text == "manager" && textBox2.Text == "123")
+            label3.Text = authorize.auth(textBox1.Text, textBox2.Text);
+
+            if (authorize.auth(textBox1.Text, textBox2.Text) != "false")
             {
-                User.AccessLevel = "manager";
-                label3.Text = "Logged in as " + User.AccessLevel;
-                richTextBox1.Visible = true;
+                User = new user(textBox1.Text, Int32.Parse(authorize.auth(textBox1.Text, textBox2.Text)));
+                label3.Text = "logged in as " + User.Name;
+                textBox1.ReadOnly = true;
+                textBox2.ReadOnly = true;
+                button2.Enabled = true;
+                button3.Enabled = true;
+                button4.Enabled = true;
+                button6.Enabled = true;
             }
-            else if (textBox1.Text == "driver" && textBox2.Text == "123")
+            else
             {
-                User.AccessLevel = "driver";
-                label3.Text = "Logged in as " + User.AccessLevel;
-                richTextBox1.Visible = true;
-            }
-            else if (textBox1.Text == "client" && textBox2.Text == "123")
-            {
-                User.AccessLevel = "client";
-                label3.Text = "Logged in as " + User.AccessLevel;
-                richTextBox1.Visible = true;
-            }
-            else {
-                User.AccessLevel = "notLoggedIn";
                 label3.Text = "wrong credentials!";
             }
         }
@@ -53,21 +44,76 @@ namespace security_app
         private void button2_Click(object sender, EventArgs e)
         {
             //int size = -1;
+
+
             DialogResult result = openFileDialog1.ShowDialog(); // Show the dialog.
             if (result == DialogResult.OK) // Test result.
             {
                 string file = openFileDialog1.FileName;
-                file openFile = new file(file);
-                
-                try
+                openFile = new file(file);
+               
+                if (referenceMonitor.readability(openFile, User))
                 {
-                    richTextBox1.Text = File.ReadAllText(openFile.UrlPath);
+                    Console.WriteLine("in if");
+                    try
+                    {
+                        richTextBox1.Text = File.ReadAllText(openFile.UrlPath);
+                        Console.WriteLine(File.ReadAllText(openFile.UrlPath));
+                    }
+                    catch (IOException)
+                    {
+                        Console.WriteLine("error");
+                    }
                 }
-                catch (IOException)
+                else
                 {
+                    Console.WriteLine("no read access!");
+                    richTextBox1.Text = "file is open but no read access";
+                    MessageBox.Show("You user level hasn't read access for the file","Message");
                 }
             }
         }
 
+        private void button5_Click(object sender, EventArgs e)
+        {
+            textBox1.ReadOnly = false;
+            textBox2.ReadOnly = false;
+            User = null;
+            textBox1.Text = "";
+            textBox2.Text = "";
+            label3.Text = "";
+            button2.Enabled = false;
+            button3.Enabled = false;
+            button4.Enabled = false;
+            button6.Enabled = false;
+            richTextBox1.Text = "";
+            richTextBox1.Enabled = false;
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (referenceMonitor.writabiliy(openFile, User))
+            {
+                richTextBox1.Enabled = true;
+            }
+            else
+            {
+                MessageBox.Show("You don't have rights to write this file!", "Message");
+            }
+            
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            if (referenceMonitor.writabiliy(openFile, User))
+            {
+                File.WriteAllText(openFile.UrlPath, richTextBox1.Text);
+                MessageBox.Show("file was edited", "Message");
+            }
+            else
+            {
+                MessageBox.Show("You don't have rights to write this file!", "Message");
+            }
+        }
     }
 }

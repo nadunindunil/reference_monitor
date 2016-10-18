@@ -8,11 +8,17 @@ namespace security_app
 {
     class user
     {
-        private static user instance = null;
+        //private static user instance = null;
         private String name;
-        private String pass;
+        //private String pass;
         private String state;
-        private String accessLevel;
+        private int accessLevel;
+
+        public user(string name,int accessLevel)
+        {
+            this.name = name;
+            this.accessLevel = accessLevel;
+        }
 
         public String Name
         {
@@ -21,11 +27,11 @@ namespace security_app
         }
         
 
-        public String Pass
-        {
-            get { return pass; }
-            set { pass = value; }
-        }
+        //public String Pass
+        //{
+        //    get { return pass; }
+        //    set { pass = value; }
+        //}
         
 
         public String State
@@ -35,17 +41,17 @@ namespace security_app
         }
         
 
-        public String AccessLevel
+        public int AccessLevel
         {
             get { return accessLevel; }
             set { accessLevel = value; }
         }
             
-        public static user getInstance()
-        {
-            if (instance == null) instance = new user();
-            return instance;
-        }
+        //public static user getInstance()
+        //{
+        //    if (instance == null) instance = new user();
+        //    return instance;
+        //}
 
 
 
